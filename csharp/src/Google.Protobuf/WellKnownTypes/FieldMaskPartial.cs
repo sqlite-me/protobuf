@@ -62,7 +62,7 @@ namespace Google.Protobuf.WellKnownTypes
             if (firstInvalid == null)
             {
                 var writer = new StringWriter();
-#if NET35
+#if NET35 || NET40
                 var query = paths.Select(JsonFormatter.ToJsonName);
                 JsonFormatter.WriteString(writer, string.Join(",", query.ToArray()));
 #else

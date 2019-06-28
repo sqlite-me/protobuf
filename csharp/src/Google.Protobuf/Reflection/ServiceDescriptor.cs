@@ -60,12 +60,22 @@ namespace Google.Protobuf.Reflection
         /// </summary>
         public override string Name { get { return proto.Name; } }
 
-        internal override IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
+        internal override
+#if NET35 || NET40
+IList<DescriptorBase>
+#else
+IReadOnlyList<DescriptorBase>
+#endif
+             GetNestedDescriptorListForField(int fieldNumber)
         {
             switch (fieldNumber)
             {
                 case ServiceDescriptorProto.MethodFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) methods;
+#if NET35 || NET40
+ return  (IList<DescriptorBase>)methods;
+#else
+                    return (IReadOnlyList<DescriptorBase>)methods;
+#endif
                 default:
                     return null;
             }

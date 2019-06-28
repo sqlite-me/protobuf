@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>C# runtime library for Protocol Buffers - Google's data interchange format.</Description>
@@ -7,7 +7,7 @@
     <VersionPrefix>3.9.0-rc1</VersionPrefix>
     <LangVersion>6</LangVersion>
     <Authors>Google Inc.</Authors>
-    <TargetFrameworks>netstandard1.0;netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>net3.5;net40;net45;netstandard1.0;netstandard2.0;</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyOriginatorKeyFile>../../keys/Google.Protobuf.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>

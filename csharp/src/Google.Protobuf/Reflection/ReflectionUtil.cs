@@ -120,8 +120,11 @@ namespace Google.Protobuf.Reflection
         /// the type that declares the method, and the second argument to the first parameter type of the method.
         /// </summary>
         internal static IExtensionReflectionHelper CreateExtensionHelper(Extension extension) =>
-            (IExtensionReflectionHelper)Activator.CreateInstance(typeof(ExtensionReflectionHelper<,>).MakeGenericType(extension.TargetType, extension.GetType().GenericTypeArguments[1]));
-
+#if NET35 || NET40
+            (IExtensionReflectionHelper)Activator.CreateInstance(typeof(ExtensionReflectionHelper<,>).MakeGenericType(extension.TargetType, extension.GetType().GetGenericArguments()[1]));
+#else
+        (IExtensionReflectionHelper)Activator.CreateInstance(typeof(ExtensionReflectionHelper<,>).MakeGenericType(extension.TargetType, extension.GetType().GenericTypeArguments[1]));
+#endif
         /// <summary>
         /// Creates a reflection helper for the given type arguments. Currently these are created on demand
         /// rather than cached; this will be "busy" when initially loading a message's descriptor, but after that

@@ -59,7 +59,13 @@ namespace Google.Protobuf.Reflection
             setValueDelegate = ReflectionUtil.CreateActionIMessageObject(property.GetSetMethod());
             if (descriptor.File.Proto.Syntax == "proto2")
             {
-                MethodInfo hasMethod = property.DeclaringType.GetRuntimeProperty("Has" + property.Name).GetMethod;
+                var pro = property.DeclaringType.GetRuntimeProperty("Has" + property.Name);
+                MethodInfo hasMethod;
+#if NET35 || NET40
+                hasMethod = pro.GetGetMethod();
+#else
+                hasMethod = pro.GetMethod;
+#endif
                 if (hasMethod == null) {
                   throw new ArgumentException("Not all required properties/methods are available");
                 }

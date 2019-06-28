@@ -89,7 +89,13 @@ namespace Google.Protobuf.Reflection
         /// Leading whitespace and the comment marker ("//") are removed from each line.
         /// The list is never null, but may be empty. Likewise each element is never null, but may be empty.
         /// </summary>
-        public IReadOnlyList<string> LeadingDetachedComments { get; }
+        public
+#if NET35 || NET40
+            IList<string>
+#else
+            IReadOnlyList<string>
+#endif
+            LeadingDetachedComments { get; }
 
         private DescriptorDeclaration(IDescriptor descriptor, Location location)
         {
@@ -103,7 +109,12 @@ namespace Google.Protobuf.Reflection
             EndColumn = location.Span[hasEndLine ? 3 : 2] + 1;
             LeadingComments = location.LeadingComments;
             TrailingComments = location.TrailingComments;
-            LeadingDetachedComments = new ReadOnlyCollection<string>(location.LeadingDetachedComments.ToList());
+            var list = location.LeadingDetachedComments.ToList();
+#if NET35 || NET40
+            LeadingDetachedComments =list;
+#else
+            LeadingDetachedComments = new ReadOnlyCollection<string>(list);
+#endif
         }
 
         internal static DescriptorDeclaration FromProto(IDescriptor descriptor, Location location) =>

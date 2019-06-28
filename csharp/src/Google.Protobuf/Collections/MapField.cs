@@ -67,7 +67,7 @@ namespace Google.Protobuf.Collections
     /// </para>
     /// </remarks>
     public sealed class MapField<TKey, TValue> : IDeepCloneable<MapField<TKey, TValue>>, IDictionary<TKey, TValue>, IEquatable<MapField<TKey, TValue>>, IDictionary
-#if !NET35
+#if !NET35 && !NET40
         , IReadOnlyDictionary<TKey, TValue>
 #endif
     {
@@ -552,7 +552,7 @@ namespace Google.Protobuf.Collections
         #endregion
 
         #region IReadOnlyDictionary explicit interface implementation
-#if !NET35
+#if !NET35 && !NET40
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;

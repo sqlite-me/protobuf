@@ -30,7 +30,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#if NET35
+#if NET35 || NET40
 using System;
 using System.Reflection;
 

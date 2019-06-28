@@ -35,11 +35,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-#if !NET35
+#if !NET35 && !NET40
 using System.Threading;
 using System.Threading.Tasks;
 #endif
-#if NET35
+#if NET35||NET40
 using Google.Protobuf.Compatibility;
 #endif
 
@@ -169,7 +169,7 @@ namespace Google.Protobuf
             return AttachBytes(bytes);
         }
 
-#if !NET35
+#if !NET35 && !NET40
         /// <summary>
         /// Constructs a <see cref="ByteString"/> from data in the given stream, asynchronously.
         /// </summary>

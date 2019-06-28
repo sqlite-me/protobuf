@@ -33,7 +33,7 @@
 using System;
 using System.Reflection;
 
-#if !NET35
+#if !NET35 && !NET40
 namespace Google.Protobuf.Compatibility
 {
     /// <summary>

@@ -59,7 +59,13 @@ namespace Google.Protobuf.Reflection
             ForceReflectionInitialization<Value.KindOneofCase>();
         }
 
-        private readonly Lazy<Dictionary<IDescriptor, DescriptorDeclaration>> declarations;
+        private readonly
+#if NET35
+            Dictionary<IDescriptor, DescriptorDeclaration>
+#else
+            Lazy<Dictionary<IDescriptor, DescriptorDeclaration>>
+#endif
+            declarations;
 
         private FileDescriptor(ByteString descriptorData, FileDescriptorProto proto, IEnumerable<FileDescriptor> dependencies, DescriptorPool pool, bool allowUnknownDependencies, GeneratedClrTypeInfo generatedCodeInfo)
         {
@@ -86,7 +92,11 @@ namespace Google.Protobuf.Reflection
 
             Extensions = new ExtensionCollection(this, generatedCodeInfo?.Extensions);
 
+#if NET35
+            declarations=CreateDeclarationMap();
+#else
             declarations = new Lazy<Dictionary<IDescriptor, DescriptorDeclaration>>(CreateDeclarationMap, LazyThreadSafetyMode.ExecutionAndPublication);
+#endif
         }
 
         private Dictionary<IDescriptor, DescriptorDeclaration> CreateDeclarationMap()
@@ -112,7 +122,12 @@ namespace Google.Protobuf.Reflection
             {
                 return null;
             }
-            IReadOnlyList<DescriptorBase> topLevelList = GetNestedDescriptorListForField(path[0]);
+#if NET35 || NET40
+            IList<DescriptorBase>
+#else
+            IReadOnlyList<DescriptorBase>
+#endif
+            topLevelList = GetNestedDescriptorListForField(path[0]);
             DescriptorBase current = GetDescriptorFromList(topLevelList, path[1]);
 
             for (int i = 2; current != null && i < path.Count; i += 2)
@@ -123,7 +138,13 @@ namespace Google.Protobuf.Reflection
             return current;
         }
 
-        private DescriptorBase GetDescriptorFromList(IReadOnlyList<DescriptorBase> list, int index)
+        private DescriptorBase GetDescriptorFromList(
+#if NET35 || NET40
+            IList<DescriptorBase>
+#else
+            IReadOnlyList<DescriptorBase>
+#endif
+             list, int index)
         {
             // This is fine: it may be a newer version of protobuf than we understand, with a new descriptor
             // field.
@@ -140,26 +161,47 @@ namespace Google.Protobuf.Reflection
             }
             return list[index];
         }
-
-        private IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
+#if NET35 || NET40
+        private IList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
         {
             switch (fieldNumber)
             {
                 case FileDescriptorProto.ServiceFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) Services;
+                    return (IList<DescriptorBase>)Services;
                 case FileDescriptorProto.MessageTypeFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) MessageTypes;
+                    return (IList<DescriptorBase>)MessageTypes;
                 case FileDescriptorProto.EnumTypeFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) EnumTypes;
+                    return (IList<DescriptorBase>)EnumTypes;
                 default:
                     return null;
             }
         }
 
+#else
+        private IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
+        {
+            switch (fieldNumber)
+            {
+                case FileDescriptorProto.ServiceFieldNumber:
+                    return (IReadOnlyList<DescriptorBase>)Services;
+                case FileDescriptorProto.MessageTypeFieldNumber:
+                    return (IReadOnlyList<DescriptorBase>)MessageTypes;
+                case FileDescriptorProto.EnumTypeFieldNumber:
+                    return (IReadOnlyList<DescriptorBase>)EnumTypes;
+                default:
+                    return null;
+            }
+        }
+
+#endif
         internal DescriptorDeclaration GetDeclaration(IDescriptor descriptor)
         {
             DescriptorDeclaration declaration;
+#if NET35
+            declarations.TryGetValue(descriptor, out declaration);
+#else
             declarations.Value.TryGetValue(descriptor, out declaration);
+#endif
             return declaration;
         }
 
@@ -439,7 +481,13 @@ namespace Google.Protobuf.Reflection
         /// depends on C, then the descriptors must be presented in the order C, B, A.) This is compatible
         /// with the order in which protoc provides descriptors to plugins.</param>
         /// <returns>The file descriptors corresponding to <paramref name="descriptorData"/>.</returns>
-        public static IReadOnlyList<FileDescriptor> BuildFromByteStrings(IEnumerable<ByteString> descriptorData)
+        public static
+#if NET35 || NET40
+            IList<FileDescriptor>
+#else
+            IReadOnlyList<FileDescriptor>
+#endif
+             BuildFromByteStrings(IEnumerable<ByteString> descriptorData)
         {
             ProtoPreconditions.CheckNotNull(descriptorData, nameof(descriptorData));
 
@@ -472,7 +520,11 @@ namespace Google.Protobuf.Reflection
                 }
                 descriptorsByName.Add(descriptor.Name, descriptor);
             }
+#if NET35 || NET40
+              return descriptors;
+#else
             return new ReadOnlyCollection<FileDescriptor>(descriptors);
+#endif
         }
 
         /// <summary>

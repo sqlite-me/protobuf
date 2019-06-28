@@ -34,7 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-#if NET35
+#if NET35 || NET40
 // Needed for ReadOnlyDictionary, which does not exist in .NET 3.5
 using Google.Protobuf.Collections;
 #endif
@@ -101,7 +101,13 @@ namespace Google.Protobuf.Reflection
             Fields = new FieldCollection(this);
         }
 
-        private static ReadOnlyDictionary<string, FieldDescriptor> CreateJsonFieldMap(IList<FieldDescriptor> fields)
+        private static
+            #if NET35 || NET40
+            Dictionary<string, FieldDescriptor>
+#else
+            ReadOnlyDictionary<string, FieldDescriptor>
+#endif
+            CreateJsonFieldMap(IList<FieldDescriptor> fields)
         {
             var map = new Dictionary<string, FieldDescriptor>();
             foreach (var field in fields)
@@ -109,29 +115,37 @@ namespace Google.Protobuf.Reflection
                 map[field.Name] = field;
                 map[field.JsonName] = field;
             }
+#if NET35 || NET40
+            return map;
+#else
             return new ReadOnlyDictionary<string, FieldDescriptor>(map);
+#endif
         }
 
         /// <summary>
         /// The brief name of the descriptor's target.
         /// </summary>
         public override string Name => Proto.Name;
+#if NET35 || NET40
 
-        internal override IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
+        internal override IList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
         {
             switch (fieldNumber)
             {
                 case DescriptorProto.FieldFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) fieldsInDeclarationOrder;
+                    return (IList<DescriptorBase>)fieldsInDeclarationOrder;
                 case DescriptorProto.NestedTypeFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) NestedTypes;
+                    return (IList<DescriptorBase>)NestedTypes;
                 case DescriptorProto.EnumTypeFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) EnumTypes;
+                    return (IList<DescriptorBase>)EnumTypes;
                 default:
                     return null;
             }
         }
 
+#else
+
+#endif
         internal DescriptorProto Proto { get; }
 
         /// <summary>
